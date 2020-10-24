@@ -1,8 +1,6 @@
 package at.fhv.sim.des.parts.impl;
 
 import at.fhv.sim.des.elements.IElement;
-import at.fhv.sim.des.events.IEvent;
-import at.fhv.sim.des.events.impl.DepartureEvent;
 import at.fhv.sim.des.exceptions.QueueOverrunException;
 import at.fhv.sim.des.parts.IQueue;
 import at.fhv.sim.des.parts.IRessource;
@@ -14,12 +12,12 @@ import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import java.util.HashMap;
 
 public class SimService implements ISimPart {
-    private IRessourcePool ressourcePool;
-    private IQueue queue;
-    private AbstractRealDistribution dist;
-    private IScheduler scheduler;
-    private ISimPart outPort;
-    private HashMap<IElement, IRessource> ressourceHashMap = new HashMap<>();
+    private final IRessourcePool ressourcePool;
+    private final IQueue queue;
+    private final AbstractRealDistribution dist;
+    private final IScheduler scheduler;
+    private final ISimPart outPort;
+    private final HashMap<IElement, IRessource> ressourceHashMap = new HashMap<>();
 
     public SimService(IRessourcePool ressourcePool, IQueue queue, AbstractRealDistribution dist, IScheduler scheduler, ISimPart outPort) {
         this.ressourcePool = ressourcePool;
@@ -33,8 +31,7 @@ public class SimService implements ISimPart {
     public void handleIncoming(IElement el) {
         IRessource teller = ressourcePool.getAvailableRessource();
         if(teller != null) {
-            IEvent nextEvent = new DepartureEvent(dist.sample(), this, el);
-            scheduler.scheduleEvent(nextEvent);
+            scheduler.scheduleDiscreteEvent(dist.sample(), () -> pushToNext(el));
             ressourceHashMap.put(el, teller);
         } else {
             try {
@@ -59,7 +56,8 @@ public class SimService implements ISimPart {
     @Override
     public void init() {
         ressourcePool.init();
-        queue.clearQueue();
+        queue.init();
         ressourceHashMap.clear();
+        outPort.init();
     }
 }

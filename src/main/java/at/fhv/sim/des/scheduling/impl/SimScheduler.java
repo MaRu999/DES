@@ -1,7 +1,8 @@
 package at.fhv.sim.des.scheduling.impl;
 
+import at.fhv.sim.des.events.ICallback;
 import at.fhv.sim.des.events.IEvent;
-import at.fhv.sim.des.events.impl.ArrivalFromSourceEvent;
+import at.fhv.sim.des.events.impl.DiscreteEvent;
 import at.fhv.sim.des.events.impl.SimulationEndEvent;
 import at.fhv.sim.des.scheduling.IClock;
 import at.fhv.sim.des.scheduling.IScheduler;
@@ -20,25 +21,31 @@ public class SimScheduler implements IScheduler {
     }
 
     @Override
-    public void scheduleEvent(IEvent event) {
-        if (event instanceof SimulationEndEvent) {
-            stopSimulation();
-        } else if (event instanceof ArrivalFromSourceEvent) {
-            events.add(event);
-        } else {
-            double delta = event.getEventTime();
-            event.setEventTime(delta + sysClock.getCurrentTime());
-            events.add(event);
-        }
+    public void scheduleDiscreteEvent(double time, ICallback callback) {
+        events.add(new DiscreteEvent(time + sysClock.getCurrentTime(), callback));
+    }
+
+    @Override
+    public void scheduleArrivalFromSourceEvent(double time, ICallback callback) {
+        events.add(new DiscreteEvent(time, callback));
+    }
+
+    @Override
+    public void scheduleSimulationEndEvent(double time) {
+        events.add(new SimulationEndEvent(time));
     }
 
     @Override
     public void executeNextEvent() {
         IEvent nextEvent = events.poll();
+
         if (nextEvent != null) {
-            sysClock.setTime(nextEvent.getEventTime());
-            System.out.println("sysClock = " + sysClock.getCurrentTime());
-            nextEvent.execute();
+            if (nextEvent instanceof SimulationEndEvent) {
+                stopSimulation();
+            } else {
+                sysClock.setTime(nextEvent.getEventTime());
+                nextEvent.execute();
+            }
         } else {
             stopSimulation();
         }

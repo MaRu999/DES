@@ -1,6 +1,8 @@
 package at.fhv.sim.des.model;
 
-public interface ISimulationModel {
+import at.fhv.sim.des.IInitiable;
+
+public interface ISimulationModel extends IInitiable {
 
     String runSimulation();
 

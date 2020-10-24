@@ -1,7 +1,6 @@
 package at.fhv.sim.des.parts.impl;
 
 import at.fhv.sim.des.elements.IElement;
-import at.fhv.sim.des.exceptions.QueueOverrunException;
 import at.fhv.sim.des.parts.IQueue;
 import at.fhv.sim.des.statistics.IReport;
 import at.fhv.sim.des.statistics.impl.QueueReport;
@@ -9,30 +8,24 @@ import at.fhv.sim.des.statistics.impl.QueueReport;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SimQueue implements IQueue {
+public class SimUnlimitedQueue implements IQueue {
     private final List<IElement> elements = new LinkedList<>();
-    private final int maxCapacity;
     private final IReport report;
 
-    public SimQueue(int maxCapacity, String name) {
-        this.maxCapacity = maxCapacity;
-        report = new QueueReport(name);
+    public SimUnlimitedQueue(String name) {
+        this.report = new QueueReport(name);
     }
 
     @Override
-    public void addElement(IElement el) throws QueueOverrunException {
-        if (elements.size() < maxCapacity) {
-            elements.add(el);
-            addLengthToStatistic(elements.size());
-        } else {
-            throw new QueueOverrunException("Queue was overrun!");
-        }
+    public void addElement(IElement el) {
+        elements.add(el);
+        addLengthToStatistic(elements.size());
     }
 
     @Override
     public IElement getElement() {
-        addLengthToStatistic(elements.size());
         if (!elements.isEmpty()) {
+            addLengthToStatistic(elements.size() - 1);
             return elements.remove(0);
         } else {
             return null;

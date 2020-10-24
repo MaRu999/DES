@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StatisticsCollector implements IStatisticsCollector {
-    private List<IReportingPart> reportingParts = new LinkedList<>();
+    private final List<IReportingPart> reportingParts = new LinkedList<>();
 
     @Override
     public void registerReportingPart(IReportingPart reportingPart) {
@@ -21,9 +21,7 @@ public class StatisticsCollector implements IStatisticsCollector {
 
     public String collectToString() {
         StringBuilder sb = new StringBuilder();
-        reportingParts.stream().parallel().forEach( part -> {
-            sb.append(part.getReport().reportToString());
-        });
+        reportingParts.forEach( part -> sb.append(part.getReport().reportToString()).append(System.lineSeparator()));
         return sb.toString();
     }
 
@@ -31,6 +29,5 @@ public class StatisticsCollector implements IStatisticsCollector {
     public String abortingToString() {
         return "RUN ABORTED DUE TO QUEUE OVERRUN!!!";
     }
-
 
 }

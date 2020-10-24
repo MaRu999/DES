@@ -30,6 +30,7 @@ public class SimSelectOutput implements ISimPart {
 
     @Override
     public void init() {
-
+        optionOne.init();
+        optionTwo.init();
     }
 }

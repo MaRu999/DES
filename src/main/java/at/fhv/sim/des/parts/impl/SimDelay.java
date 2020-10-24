@@ -1,9 +1,6 @@
 package at.fhv.sim.des.parts.impl;
 
 import at.fhv.sim.des.elements.IElement;
-import at.fhv.sim.des.events.IEvent;
-import at.fhv.sim.des.events.impl.ArrivalEvent;
-import at.fhv.sim.des.events.impl.DepartureEvent;
 import at.fhv.sim.des.exceptions.QueueOverrunException;
 import at.fhv.sim.des.parts.IQueue;
 import at.fhv.sim.des.parts.ISimPart;
@@ -28,8 +25,7 @@ public class SimDelay implements ISimPart {
     @Override
     public void handleIncoming(IElement el) {
         if(!busy) {
-            IEvent nextEvent = new DepartureEvent(dist.sample(), this, el);
-            scheduler.scheduleEvent(nextEvent);
+            scheduler.scheduleDiscreteEvent(dist.sample(), () -> pushToNext(el));
             busy = true;
         } else {
             try {
@@ -52,7 +48,8 @@ public class SimDelay implements ISimPart {
 
     @Override
     public void init() {
-        queue.clearQueue();
+        queue.init();
         busy = false;
+        outPort.init();
     }
 }

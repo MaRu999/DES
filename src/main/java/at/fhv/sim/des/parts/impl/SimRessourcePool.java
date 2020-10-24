@@ -7,11 +7,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SimRessourcePool implements IRessourcePool {
-    private int maxAmount;
-    private List<IRessource> tellers = new LinkedList<>();
+    private final int maxAmount;
+    private final List<IRessource> tellers = new LinkedList<>();
 
     public SimRessourcePool(int maxAmount) {
         this.maxAmount = maxAmount;
+        this.init();
     }
 
     @Override
