@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+apply plugin : "java"
+
+ext {
+    mainClass = "at.fhv.sim.des.Main"
+}
+
+group 'at.fhv.sim.des'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+}
+
+application {
+    mainClassName = mainClass
+}
