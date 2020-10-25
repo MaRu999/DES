@@ -41,18 +41,19 @@ public class BankSimTemplate implements ISimTemplate {
         }
         IClock sysClock = new SimClock();
         ISink sink = new SimSink(sysClock);
-        IQueue qu = new SimQueue(40, "ATM");
+        IQueue qu = new SimQueue(40, "ATM queue");
         IScheduler scheduler = new SimScheduler(sysClock);
         IStatisticsCollector collector = new StatisticsCollector();
         collector.registerReportingPart(qu);
         collector.registerReportingPart(sink);
         IRessourcePool ressourcePool = new SimRessourcePool(5);
-        IQueue quTwo = new SimUnlimitedQueue("Cashiers");
+        IQueue quTwo = new SimUnlimitedQueue("Service queue");
         collector.registerReportingPart(quTwo);
         IService service = new SimService(ressourcePool, quTwo, serviceDist, scheduler, sink, "Tellers");
         collector.registerReportingPart(service);
         ISimPart needAdditionalService = new SimSelectOutput(service, sink, 0.3, needAddServiceDist);
-        ISimPart delay = new SimDelay(needAdditionalService, qu, delayDist, scheduler);
+        IDelay delay = new SimDelay(needAdditionalService, qu, delayDist, scheduler, "ATM");
+        collector.registerReportingPart(delay);
         ISimPart needToSeeCashier = new SimSelectOutput(service, delay, 0.5, needToSeeCashierDist);
         ISource src = new SimSource(needToSeeCashier, 4.0 / 3.0, scheduler, 50000);
         return new SimulationModel(scheduler, src, collector);

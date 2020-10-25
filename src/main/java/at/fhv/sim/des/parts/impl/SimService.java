@@ -34,7 +34,7 @@ public class SimService implements IService {
     @Override
     public void handleIncoming(IElement el) {
         IRessource teller = ressourcePool.getAvailableRessource();
-        if(teller != null) {
+        if (teller != null) {
             scheduler.scheduleDiscreteEvent(dist.sample(), () -> pushToNext(el));
             idleMean.increment(teller.busy(scheduler.getCurrentTime()));
             ressourceHashMap.put(el, teller);
@@ -52,7 +52,7 @@ public class SimService implements IService {
         outPort.handleIncoming(el);
         IRessource teller = ressourceHashMap.remove(el);
         busyMean.increment(teller.idle(scheduler.getCurrentTime()));
-        if(!queue.isEmpty()) {
+        if (!queue.isEmpty()) {
             IElement element = queue.getElement();
             handleIncoming(element);
         }
@@ -64,11 +64,14 @@ public class SimService implements IService {
         queue.init();
         ressourceHashMap.clear();
         outPort.init();
+        idleMean.clear();
+        busyMean.clear();
+        report.init();
     }
 
     @Override
     public IReport getReport() {
-        report.addValue((100 * busyMean.getResult())/(idleMean.getResult() + busyMean.getResult()));
+        report.addValue((100 * busyMean.getResult()) / (idleMean.getResult() + busyMean.getResult()));
         return report;
     }
 }

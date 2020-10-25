@@ -33,11 +33,6 @@ public class SimulationModel implements ISimulationModel {
     }
 
     @Override
-    public boolean isFinished() {
-        return scheduler.isFinished();
-    }
-
-    @Override
     public void init() {
         modelSource.init();
     }
