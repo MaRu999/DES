@@ -8,6 +8,4 @@ import java.util.List;
 public interface ISimulationModel extends IInitiable {
 
     List<IReport> runSimulation();
-
-    boolean isFinished();
 }
