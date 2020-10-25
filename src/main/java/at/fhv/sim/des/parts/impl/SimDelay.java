@@ -24,7 +24,7 @@ public class SimDelay implements ISimPart {
 
     @Override
     public void handleIncoming(IElement el) {
-        if(!busy) {
+        if (!busy) {
             scheduler.scheduleDiscreteEvent(dist.sample(), () -> pushToNext(el));
             busy = true;
         } else {
@@ -40,9 +40,9 @@ public class SimDelay implements ISimPart {
     public void pushToNext(IElement el) {
         outPort.handleIncoming(el);
         busy = false;
-        if(!queue.isEmpty()) {
+        if (!queue.isEmpty()) {
             IElement element = queue.getElement();
-            handleIncoming(element);
+            this.handleIncoming(element);
         }
     }
 

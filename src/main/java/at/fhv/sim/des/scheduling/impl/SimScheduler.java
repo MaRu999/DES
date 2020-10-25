@@ -22,23 +22,22 @@ public class SimScheduler implements IScheduler {
 
     @Override
     public void scheduleDiscreteEvent(double time, ICallback callback) {
-        events.add(new DiscreteEvent(time + sysClock.getCurrentTime(), callback));
+        events.offer(new DiscreteEvent(time + sysClock.getCurrentTime(), callback));
     }
 
     @Override
     public void scheduleArrivalFromSourceEvent(double time, ICallback callback) {
-        events.add(new DiscreteEvent(time, callback));
+        events.offer(new DiscreteEvent(time, callback));
     }
 
     @Override
     public void scheduleSimulationEndEvent(double time) {
-        events.add(new SimulationEndEvent(time));
+        events.offer(new SimulationEndEvent(time));
     }
 
     @Override
     public void executeNextEvent() {
         IEvent nextEvent = events.poll();
-
         if (nextEvent != null) {
             if (nextEvent instanceof SimulationEndEvent) {
                 stopSimulation();

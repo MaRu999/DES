@@ -7,10 +7,10 @@ import at.fhv.sim.des.statistics.IReport;
 import at.fhv.sim.des.statistics.impl.QueueReport;
 
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
 public class SimQueue implements IQueue {
-    private final List<IElement> elements = new LinkedList<>();
+    private final Queue<IElement> elements = new LinkedList<>();
     private final int maxCapacity;
     private final IReport report;
 
@@ -22,7 +22,7 @@ public class SimQueue implements IQueue {
     @Override
     public void addElement(IElement el) throws QueueOverrunException {
         if (elements.size() < maxCapacity) {
-            elements.add(el);
+            elements.offer(el);
             addLengthToStatistic(elements.size());
         } else {
             throw new QueueOverrunException("Queue was overrun!");
@@ -32,11 +32,7 @@ public class SimQueue implements IQueue {
     @Override
     public IElement getElement() {
         addLengthToStatistic(elements.size());
-        if (!elements.isEmpty()) {
-            return elements.remove(0);
-        } else {
-            return null;
-        }
+        return elements.poll();
     }
 
     @Override

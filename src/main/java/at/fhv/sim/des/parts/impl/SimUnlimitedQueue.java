@@ -6,10 +6,10 @@ import at.fhv.sim.des.statistics.IReport;
 import at.fhv.sim.des.statistics.impl.QueueReport;
 
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 
 public class SimUnlimitedQueue implements IQueue {
-    private final List<IElement> elements = new LinkedList<>();
+    private final Queue<IElement> elements = new LinkedList<>();
     private final IReport report;
 
     public SimUnlimitedQueue(String name) {
@@ -18,18 +18,13 @@ public class SimUnlimitedQueue implements IQueue {
 
     @Override
     public void addElement(IElement el) {
-        elements.add(el);
+        elements.offer(el);
         addLengthToStatistic(elements.size());
     }
 
     @Override
     public IElement getElement() {
-        if (!elements.isEmpty()) {
-            addLengthToStatistic(elements.size() - 1);
-            return elements.remove(0);
-        } else {
-            return null;
-        }
+        return elements.poll();
     }
 
     @Override

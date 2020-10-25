@@ -18,7 +18,7 @@ public class TimeInSystemReport implements IReport {
 
     @Override
     public String reportToString() {
-        return "Average Time in System: " + mean.getResult();
+        return "Average Time in System: " + mean.getResult() + ", NumberOfServedClients: " + mean.getN();
     }
 
     @Override

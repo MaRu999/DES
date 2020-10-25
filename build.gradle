@@ -3,7 +3,12 @@ plugins {
     id 'application'
 }
 
-apply plugin : "java"
+apply plugin: "java"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 ext {
     mainClass = "at.fhv.sim.des.Main"
