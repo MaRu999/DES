@@ -8,16 +8,22 @@ import at.fhv.sim.des.scheduling.IClock;
 import at.fhv.sim.des.scheduling.IScheduler;
 import at.fhv.sim.des.scheduling.impl.SimClock;
 import at.fhv.sim.des.scheduling.impl.SimScheduler;
+import at.fhv.sim.des.statistics.IReport;
 import at.fhv.sim.des.statistics.IStatisticsCollector;
+import at.fhv.sim.des.statistics.impl.AbortionReport;
 import at.fhv.sim.des.statistics.impl.StatisticsCollector;
 import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.apache.commons.math3.distribution.TriangularDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class BankSimTemplate implements ISimTemplate {
+    private final HashMap<String, Mean> means = new HashMap<>();
+    private int aborted;
 
     @Override
     public ISimulationModel createNewSimulation(boolean repeatable) {
@@ -25,7 +31,7 @@ public class BankSimTemplate implements ISimTemplate {
         AbstractRealDistribution serviceDist = new TriangularDistribution(3, 5, 20);
         AbstractRealDistribution needAddServiceDist = new UniformRealDistribution(0, 1);
         AbstractRealDistribution needToSeeCashierDist = new UniformRealDistribution(0, 1);
-        if(repeatable) {
+        if (repeatable) {
             delayDist.reseedRandomGenerator(1);
             serviceDist.reseedRandomGenerator(1);
             needAddServiceDist.reseedRandomGenerator(1);
@@ -46,8 +52,30 @@ public class BankSimTemplate implements ISimTemplate {
         ISimPart needAdditionalService = new SimSelectOutput(service, sink, 0.3, needAddServiceDist);
         ISimPart delay = new SimDelay(needAdditionalService, qu, delayDist, sched);
         ISimPart needToSeeCashier = new SimSelectOutput(service, delay, 0.5, needToSeeCashierDist);
-        ISource src = new SimSource(needToSeeCashier, 4.0/3.0, sched, 50000);
+        ISource src = new SimSource(needToSeeCashier, 4.0 / 3.0, sched, 50000);
         return new SimulationModel(sched, src, collector);
+    }
+
+    private void collectStatistics(IReport report) {
+        if (report instanceof AbortionReport) {
+            aborted += 1;
+        } else {
+            String name = report.getName();
+            if (means.containsKey(name)) {
+                means.get(name).increment(report.getAverage());
+            } else {
+                Mean mean = new Mean();
+                mean.increment(report.getAverage());
+                means.put(name, mean);
+            }
+        }
+    }
+
+    private String getAverages() {
+        StringBuilder sb = new StringBuilder();
+        means.forEach((name, mean) -> sb.append(name).append(": ").append(mean.getResult()).append(System.lineSeparator()));
+        sb.append("Aborted runs: ").append(aborted);
+        return sb.toString();
     }
 
 
@@ -59,9 +87,10 @@ public class BankSimTemplate implements ISimTemplate {
         }
         for (int i = 0; i < totalNumberOfRuns; i += numberOfParallelRuns) {
             mods.stream().parallel().forEach(sim -> {
-                System.out.println(sim.runSimulation());
+                sim.runSimulation().forEach(this::collectStatistics);
                 sim.init();
             });
         }
+        System.out.println(getAverages());
     }
 }

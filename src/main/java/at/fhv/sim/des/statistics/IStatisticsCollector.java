@@ -12,4 +12,8 @@ public interface IStatisticsCollector {
     String collectToString();
 
     String abortingToString();
+
+    List<IReport> getAllReports();
+
+    List<IReport> getAbortionReports();
 }

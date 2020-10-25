@@ -22,6 +22,11 @@ public class TimeInSystemReport implements IReport {
     }
 
     @Override
+    public String getName() {
+        return "Average Time in System";
+    }
+
+    @Override
     public void init() {
         mean.clear();
     }

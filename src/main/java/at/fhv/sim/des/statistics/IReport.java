@@ -9,4 +9,6 @@ public interface IReport extends IInitiable {
     double getAverage();
 
     String reportToString();
+
+    String getName();
 }

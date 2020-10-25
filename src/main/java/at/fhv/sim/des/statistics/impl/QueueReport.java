@@ -27,6 +27,11 @@ public class QueueReport implements IReport {
     }
 
     @Override
+    public String getName() {
+        return "Average queue length for: " + name;
+    }
+
+    @Override
     public void init() {
         mean.clear();
     }

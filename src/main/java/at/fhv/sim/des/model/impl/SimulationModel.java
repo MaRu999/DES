@@ -3,7 +3,10 @@ package at.fhv.sim.des.model.impl;
 import at.fhv.sim.des.model.ISimulationModel;
 import at.fhv.sim.des.parts.ISource;
 import at.fhv.sim.des.scheduling.IScheduler;
+import at.fhv.sim.des.statistics.IReport;
 import at.fhv.sim.des.statistics.IStatisticsCollector;
+
+import java.util.List;
 
 public class SimulationModel implements ISimulationModel {
     private final IScheduler scheduler;
@@ -17,18 +20,16 @@ public class SimulationModel implements ISimulationModel {
     }
 
     @Override
-    public String runSimulation() {
+    public List<IReport> runSimulation() {
         while (!scheduler.isFinished()) {
             modelSource.scheduleArrival();
             scheduler.executeNextEvent();
         }
-        String report;
         if (scheduler.wasAborted()) {
-            report = statisticsCollector.abortingToString();
+            return statisticsCollector.getAbortionReports();
         } else {
-            report = statisticsCollector.collectToString();
+            return statisticsCollector.getAllReports();
         }
-        return report;
     }
 
     @Override

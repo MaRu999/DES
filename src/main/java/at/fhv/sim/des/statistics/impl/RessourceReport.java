@@ -27,6 +27,11 @@ public class RessourceReport implements IReport {
     }
 
     @Override
+    public String getName() {
+        return "Average utilization for: " + name;
+    }
+
+    @Override
     public void init() {
         mean.clear();
     }
