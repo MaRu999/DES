@@ -23,7 +23,7 @@ public class BankSimTemplate implements ISimTemplate {
     public ISimulationModel createNewSimulation() {
         IClock sysClock = new SimClock();
         ISink sink = new SimSink(sysClock);
-        IQueue qu = new SimQueue(50000, "ATM");
+        IQueue qu = new SimQueue(40, "ATM");
         IScheduler sched = new SimScheduler(sysClock);
         IStatisticsCollector collector = new StatisticsCollector();
         collector.registerReportingPart(qu);
@@ -35,7 +35,7 @@ public class BankSimTemplate implements ISimTemplate {
         ISimPart needAdditionalService = new SimSelectOutput(service, sink, 0.3, new UniformRealDistribution(0, 1));
         ISimPart delay = new SimDelay(needAdditionalService, qu, new TriangularDistribution(1, 2, 4), sched);
         ISimPart needToSeeCashier = new SimSelectOutput(service, delay, 0.5, new UniformRealDistribution(0, 1));
-        ISource src = new SimSource(needToSeeCashier, 0.75, sched, 50000);
+        ISource src = new SimSource(needToSeeCashier, 4.0/3.0, sched, 50000);
         return new SimulationModel(sched, src, collector);
     }
 
