@@ -20,4 +20,6 @@ public interface IScheduler extends IInitiable {
     void abortSimulation();
 
     boolean wasAborted();
+
+    double getCurrentTime();
 }

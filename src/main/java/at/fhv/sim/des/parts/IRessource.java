@@ -1,9 +1,11 @@
 package at.fhv.sim.des.parts;
 
-public interface IRessource {
+import at.fhv.sim.des.IInitiable;
+
+public interface IRessource extends IInitiable {
     boolean isBusy();
 
-    void busy();
+    double busy(double curTime);
 
-    void idle();
+    double idle(double curTIme);
 }

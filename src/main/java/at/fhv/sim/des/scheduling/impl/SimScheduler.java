@@ -72,6 +72,11 @@ public class SimScheduler implements IScheduler {
     }
 
     @Override
+    public double getCurrentTime() {
+        return sysClock.getCurrentTime();
+    }
+
+    @Override
     public void init() {
         events.clear();
         sysClock.init();

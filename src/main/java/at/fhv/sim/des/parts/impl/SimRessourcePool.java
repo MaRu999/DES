@@ -2,6 +2,7 @@ package at.fhv.sim.des.parts.impl;
 
 import at.fhv.sim.des.parts.IRessource;
 import at.fhv.sim.des.parts.IRessourcePool;
+import at.fhv.sim.des.statistics.IReport;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 public class SimRessourcePool implements IRessourcePool {
     private final int maxAmount;
     private final List<IRessource> tellers = new LinkedList<>();
+
 
     public SimRessourcePool(int maxAmount) {
         this.maxAmount = maxAmount;
@@ -24,7 +26,6 @@ public class SimRessourcePool implements IRessourcePool {
                 break;
             }
         }
-        if(teller != null) teller.busy();
         return teller;
     }
 
@@ -35,4 +36,5 @@ public class SimRessourcePool implements IRessourcePool {
             tellers.add(new Teller());
         }
     }
+
 }

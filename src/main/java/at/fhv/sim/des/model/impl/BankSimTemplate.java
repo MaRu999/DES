@@ -41,7 +41,8 @@ public class BankSimTemplate implements ISimTemplate {
         IRessourcePool ressourcePool = new SimRessourcePool(5);
         IQueue quTwo = new SimUnlimitedQueue("Cashiers");
         collector.registerReportingPart(quTwo);
-        ISimPart service = new SimService(ressourcePool, quTwo, serviceDist, sched, sink);
+        IService service = new SimService(ressourcePool, quTwo, serviceDist, sched, sink, "Tellers");
+        collector.registerReportingPart(service);
         ISimPart needAdditionalService = new SimSelectOutput(service, sink, 0.3, needAddServiceDist);
         ISimPart delay = new SimDelay(needAdditionalService, qu, delayDist, sched);
         ISimPart needToSeeCashier = new SimSelectOutput(service, delay, 0.5, needToSeeCashierDist);
