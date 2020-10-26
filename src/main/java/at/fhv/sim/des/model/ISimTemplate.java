@@ -5,5 +5,4 @@ public interface ISimTemplate {
 
     String runConcurrent(int numberOfParallelRuns, int totalNumberOfRuns, boolean repeatable);
 
-    String getStatisticsReport();
 }

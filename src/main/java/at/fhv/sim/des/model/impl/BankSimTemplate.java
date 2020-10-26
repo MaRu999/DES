@@ -2,30 +2,24 @@ package at.fhv.sim.des.model.impl;
 
 import at.fhv.sim.des.model.ISimTemplate;
 import at.fhv.sim.des.model.ISimulationModel;
+import at.fhv.sim.des.model.IStatisticsSummarizer;
 import at.fhv.sim.des.parts.*;
 import at.fhv.sim.des.parts.impl.*;
 import at.fhv.sim.des.scheduling.IClock;
 import at.fhv.sim.des.scheduling.IScheduler;
 import at.fhv.sim.des.scheduling.impl.SimClock;
 import at.fhv.sim.des.scheduling.impl.SimScheduler;
-import at.fhv.sim.des.statistics.IReport;
 import at.fhv.sim.des.statistics.IStatisticsCollector;
-import at.fhv.sim.des.statistics.impl.AbortionReport;
 import at.fhv.sim.des.statistics.impl.StatisticsCollector;
 import org.apache.commons.math3.distribution.AbstractRealDistribution;
 import org.apache.commons.math3.distribution.TriangularDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 
-import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class BankSimTemplate implements ISimTemplate {
-    private final HashMap<String, Mean> means = new HashMap<>();
-    private int aborted;
-    private final DecimalFormat df = new DecimalFormat("0.000");
+    private final IStatisticsSummarizer summarizer = new StatisticsSummarizer();
 
     @Override
     public ISimulationModel createNewSimulation(boolean repeatable) {
@@ -59,30 +53,6 @@ public class BankSimTemplate implements ISimTemplate {
         return new SimulationModel(scheduler, src, collector);
     }
 
-    private void collectStatistics(IReport report) {
-        if (report instanceof AbortionReport) {
-            aborted += 1;
-        } else {
-            String name = report.getName();
-            if (means.containsKey(name)) {
-                means.get(name).increment(report.getAverage());
-            } else {
-                Mean mean = new Mean();
-                mean.increment(report.getAverage());
-                means.put(name, mean);
-            }
-        }
-    }
-
-    @Override
-    public String getStatisticsReport() {
-        StringBuilder sb = new StringBuilder();
-        means.forEach((name, mean) -> sb.append(name).append(": ").append(df.format(mean.getResult())).append(System.lineSeparator()));
-        sb.append("Aborted runs: ").append(aborted);
-        return sb.toString();
-    }
-
-
     @Override
     public String runConcurrent(int numberOfParallelRuns, int totalNumberOfRuns, boolean repeatable) {
         List<ISimulationModel> mods = new LinkedList<>();
@@ -91,10 +61,10 @@ public class BankSimTemplate implements ISimTemplate {
         }
         for (int i = 0; i < totalNumberOfRuns; i += numberOfParallelRuns) {
             mods.stream().parallel().forEach(sim -> {
-                sim.runSimulation().forEach(this::collectStatistics);
+                sim.runSimulation().forEach(summarizer::collectStatistics);
                 sim.init();
             });
         }
-        return getStatisticsReport();
+        return summarizer.getStatisticsReport();
     }
 }
