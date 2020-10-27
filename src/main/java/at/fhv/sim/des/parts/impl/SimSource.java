@@ -5,6 +5,7 @@ import at.fhv.sim.des.elements.factory.CustomerFactory;
 import at.fhv.sim.des.parts.ISimPart;
 import at.fhv.sim.des.parts.ISource;
 import at.fhv.sim.des.scheduling.IScheduler;
+import org.apache.commons.math3.distribution.AbstractRealDistribution;
 
 public class SimSource implements ISource {
     private final ISimPart outPort;
@@ -13,7 +14,7 @@ public class SimSource implements ISource {
     private final IScheduler scheduler;
     private final int endOfSimAt;
 
-    public SimSource(ISimPart outPort, double arrivalRate, IScheduler scheduler, int endOfSimAt) {
+    public SimSource(ISimPart outPort, AbstractRealDistribution arrivalRate, IScheduler scheduler, int endOfSimAt) {
         this.outPort = outPort;
         this.factory = new CustomerFactory(arrivalRate);
         this.scheduler = scheduler;
@@ -25,7 +26,7 @@ public class SimSource implements ISource {
     public void scheduleArrival() {
         if (counter < endOfSimAt) {
             IElement newEl = factory.createElement();
-            scheduler.scheduleArrivalFromSourceEvent(newEl.getArrivalTime(),() -> outPort.handleIncoming(newEl));
+            scheduler.scheduleArrivalFromSourceEvent(newEl.getArrivalTime(), () -> outPort.handleIncoming(newEl));
             counter += 1;
         } else if (counter == endOfSimAt) {
             scheduler.scheduleSimulationEndEvent(factory.getNextArrivalTime());

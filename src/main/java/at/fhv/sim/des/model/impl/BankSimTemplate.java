@@ -12,6 +12,7 @@ import at.fhv.sim.des.scheduling.impl.SimScheduler;
 import at.fhv.sim.des.statistics.IStatisticsCollector;
 import at.fhv.sim.des.statistics.impl.StatisticsCollector;
 import org.apache.commons.math3.distribution.AbstractRealDistribution;
+import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.apache.commons.math3.distribution.TriangularDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
 
@@ -27,6 +28,7 @@ public class BankSimTemplate implements ISimTemplate {
         AbstractRealDistribution serviceDist = new TriangularDistribution(3, 5, 20);
         AbstractRealDistribution needAddServiceDist = new UniformRealDistribution(0, 1);
         AbstractRealDistribution needToSeeCashierDist = new UniformRealDistribution(0, 1);
+        AbstractRealDistribution arrivalRate = new ExponentialDistribution(4.0/3.0);
         if (repeatable) {
             delayDist.reseedRandomGenerator(1);
             serviceDist.reseedRandomGenerator(1);
@@ -49,7 +51,7 @@ public class BankSimTemplate implements ISimTemplate {
         IDelay delay = new SimDelay(needAdditionalService, qu, delayDist, scheduler, "ATM");
         collector.registerReportingPart(delay);
         ISimPart needToSeeCashier = new SimSelectOutput(service, delay, 0.5, needToSeeCashierDist);
-        ISource src = new SimSource(needToSeeCashier, 4.0 / 3.0, scheduler, 50000);
+        ISource src = new SimSource(needToSeeCashier, arrivalRate, scheduler, 50000);
         return new SimulationModel(scheduler, src, collector);
     }
 
